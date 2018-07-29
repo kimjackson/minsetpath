@@ -1,0 +1,40 @@
+$ runhaskell MinSetPathTests.hs
+
+MinSetPath
+  minsetpath
+    should return 3
+    should return 1
+    should return 0
+    should return 3000000000000000
+  sumdiffs
+    should return 3
+    should return 11
+  minpath
+    endpoints
+      should return [3,4]
+      should return [1,0]
+      should return [3]
+      should return [2]
+      should return [1,2]
+    initial
+      should return [4,7]
+      should return [4,5]
+      should return [2]
+      should return [2]
+      should return [3,6]
+    trivial, multiple solutions
+      should return [2]
+      should return [3]
+      should return [3,5]
+      should return [2,0]
+    local minima / maxima
+      should return [2,3,5]
+      should return [2,0,5]
+      should return [-10,-11,-2,3,2]
+      should return [3,5,8,4,7,5,8]
+    overlaps
+      should return [3,4,5,6,5,1]
+      should return [3,5]
+
+Finished in 0.0073 seconds
+26 examples, 0 failures

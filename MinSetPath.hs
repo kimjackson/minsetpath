@@ -1,40 +1,27 @@
 module MinSetPath where
 
 minsetpath :: [(Int,Int)] -> Int
-minsetpath list  = sumdiffs (minpath [] list)
+minsetpath list  = minpath 0 list
 
-sumdiffs :: [Int] -> Int
-sumdiffs path = sum (zipWith (\a b -> abs (a - b)) (init path) (tail path))
+maxofmins :: (Int,Int) -> (Int,Int) -> Int
+maxofmins x y  = max (fst x) (fst y)
 
-minpath :: [Int] -> [(Int,Int)] -> [Int]
-minpath p []  = p
-minpath [] [x,y] | maxx == miny  = [maxx]
-                 | minx == maxy  = [minx]
-                 | maxx < miny   = [maxx,miny]
-                 | minx > maxy   = [minx,maxy]
-                 | minx == maxx  = [minx]
-                 | miny == maxy  = [miny]
-                 | minx >= miny  = [minx]
-                 | otherwise     = [miny]          -- arbitrary
-                 where minx = min (fst x) (snd x)
-                       maxx = max (fst x) (snd x)
-                       miny = min (fst y) (snd y)
-                       maxy = max (fst y) (snd y)
+minofmaxs :: (Int,Int) -> (Int,Int) -> Int
+minofmaxs x y  = min (snd x) (snd y)
 
-minpath [] (x:y:xs) | minx <= miny && maxx >= miny && maxx <= maxy  = minpath [] ((miny,maxx):xs)  -- first two ranges overlap, collapse them into one
-                    | miny <= minx && maxy >= minx && maxy <= maxx  = minpath [] ((minx,maxy):xs)
-                    | minx <= miny && maxx >= maxy  = minpath [] (y:xs)  -- one of the first two ranges is a superset of the other, ignore it
-                    | miny <= minx && maxy >= maxx  = minpath [] (x:xs)
-                    | otherwise  = minpath (minpath [] [x,y]) xs
-                    where minx = min (fst x) (snd x)
-                          maxx = max (fst x) (snd x)
-                          miny = min (fst y) (snd y)
-                          maxy = max (fst y) (snd y)
+overlaps :: (Int,Int) -> (Int,Int) -> Bool
+x `overlaps` y  = maxofmins x y <= minofmaxs x y
 
-minpath p (x:xs) | p' < minx  = minpath (p ++ [minx]) xs
-                 | p' > maxx  = minpath (p ++ [maxx]) xs
-                 | minx <= p' && p' <= maxx  = minpath p xs
-                 where minx = min (fst x) (snd x)
-                       maxx = max (fst x) (snd x)
-                       p'   = last p
+intersection :: (Int,Int) -> (Int,Int) -> (Int,Int)
+intersection x y  = ((maxofmins x y), (minofmaxs x y))
+
+dist :: (Int,Int) -> (Int,Int) -> Int
+dist x y  = (maxofmins x y) - (minofmaxs x y)
+
+minpath :: Int -> [(Int,Int)] -> Int
+minpath t []  = t
+minpath t [x] = t
+minpath t (x:y:xs) | x `overlaps` y  = minpath t (z:xs)     where z = intersection x y
+minpath t (x:y:xs) | snd x < fst y   = minpath (t+d) (z:xs) where d = dist x y; z = (fst y, fst y)
+minpath t (x:y:xs) | otherwise       = minpath (t+d) (z:xs) where d = dist x y; z = (snd y, snd y)
 
